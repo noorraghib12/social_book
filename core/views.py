@@ -18,7 +18,7 @@ def signup(request):
       email=request.POST['email']
       password1=request.POST['password1']
       password2=request.POST['password2']
-      if password1==password2:
+      if (password1!=(None or '')) and password1==password2:
          if User.objects.filter(email=email).exists():
             messages.info(request, "User already exists, please use different email address")
             redirect('signup')
@@ -66,4 +66,9 @@ def logout(request):
 
 @login_required(login_url='signin')
 def settings(request):
-   return render(request, 'setting.html')
+   user_profile=Profile.objects.get(user=request.user)
+   if request.method=='POST': 
+      usr_bio=request.POST['bio']
+      usr_jobloc=request.POST['job_location']
+      usr_location=request.POST['location']
+   return render(request, 'setting.html',{'user_profile':user_profile})
