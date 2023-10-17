@@ -9,8 +9,9 @@ from django.contrib.auth.decorators import login_required
 # Create your views here.
 @login_required(login_url='signin')
 def index(request):
-   
-   return render(request,'index.html')
+   user_object = User.objects.get(username=request.user.username)
+   user_profile = Profile.objects.get(user=user_object)
+   return render(request,'index.html',{'user_profile':user_profile})
 
 def signup(request):
    if request.method=='POST':
@@ -68,7 +69,23 @@ def logout(request):
 def settings(request):
    user_profile=Profile.objects.get(user=request.user)
    if request.method=='POST': 
+      if request.FILES.get('profileimg')==None:
+         image=user_profile.profileimg 
+      else:
+         image=request.FILES.get('profileimg')
       usr_bio=request.POST['bio']
-      usr_jobloc=request.POST['job_location']
       usr_location=request.POST['location']
+
+      user_profile.profileimg=image
+      user_profile.bio=usr_bio
+      user_profile.location=usr_location
+      user_profile.save()
+
+      redirect('settings')
+
    return render(request, 'setting.html',{'user_profile':user_profile})
+
+
+@login_required(login_url='signin')
+def upload(request):
+   return HttpResponse('<h1>UPLOAD VIEW </h1>')

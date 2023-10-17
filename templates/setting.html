@@ -36,14 +36,14 @@
                     <li><a href="#">Security</a></li>
                 </ul> -->
 
-                <div class="grid lg:grid-cols-3 mt-12 gap-8">
+                <!-- <div class="grid lg:grid-cols-3 mt-12 gap-8">
                     <div>
                         <h3 class="text-xl mb-2"> Basic</h3>
                         <p></p>
-                    </div>
+                    </div> -->
                     <div class="bg-white rounded-md lg:shadow-lg shadow col-span-2">
                     
-                    <form action="" method="POST">
+                    <form action="" method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
                        <div class="grid grid-cols-2 gap-3 lg:p-6 p-4">
 
@@ -62,16 +62,16 @@
                     
                             <div>
                                 <label for="profpic">Profile Picture</label>
-                                <input type="file" value="{{user_profile.profileimg}}" id="profpic" name='profpic'>
+                                <img width="150" height="150" src="{{user_profile.profileimg.url}}">
+                                <input type="file" value="" id="profpic" name='profileimg'>
                             </div>
                             <div class="col-span-2">
                                 <label for="about">User Biography</label>  
-                
-                                <textarea id="about" name="bio" class="shadow-none bg-gray-100">{{user_profile.bio}}</textarea>
+                                <textarea id="about" name="bio" rows="3" value="" class="shadow-none bg-gray-100">{{user_profile.bio}}</textarea>
                             </div> 
                             <div class="col-span-2">
-                                <label for=""> Location</label>
-                                <input type="text" value="{{user_profile.location}}" name="location" class="shadow-none bg-gray-100">
+                                <label for="location"> Location</label>
+                                <input type="text" id="location" value="{{user_profile.location}}" name="location" class="shadow-none bg-gray-100">
                             </div>
                             <!-- <div>
                                <label for="workat"> Working at</label>
