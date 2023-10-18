@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect
-from .models import Profile
+from .models import Profile,Post
 from django.contrib.auth.models import User,auth
 from django.contrib.auth import get_user
 from django.contrib import messages
@@ -11,7 +11,9 @@ from django.contrib.auth.decorators import login_required
 def index(request):
    user_object = User.objects.get(username=request.user.username)
    user_profile = Profile.objects.get(user=user_object)
-   return render(request,'index.html',{'user_profile':user_profile})
+
+   posts=Post.objects.all()
+   return render(request,'index.html',{'user_profile':user_profile,'posts':posts})
 
 def signup(request):
    if request.method=='POST':
@@ -85,7 +87,19 @@ def settings(request):
 
    return render(request, 'setting.html',{'user_profile':user_profile})
 
-
 @login_required(login_url='signin')
 def upload(request):
-   return HttpResponse('<h1>UPLOAD VIEW </h1>')
+   if request.method=='POST':
+      user=request.user
+      post_content=request.POST['caption']
+      post_image=request.FILES.get('post_image')
+      post=Post.objects.create(user=user,caption=post_content,image=post_image)
+      try: 
+         post.save()
+         print("saved")
+      except:
+         print("not saved")
+      return redirect('/')
+   else:
+      return redirect('/')
+      
