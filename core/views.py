@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect
-from .models import Profile,Post
+from .models import Profile,Post,LikePost
 from django.contrib.auth.models import User,auth
 from django.contrib.auth import get_user
 from django.contrib import messages
@@ -94,12 +94,30 @@ def upload(request):
       post_content=request.POST['caption']
       post_image=request.FILES.get('post_image')
       post=Post.objects.create(user=user,caption=post_content,image=post_image)
-      try: 
-         post.save()
-         print("saved")
-      except:
-         print("not saved")
+      post.save()
+
       return redirect('/')
    else:
       return redirect('/')
-      
+
+@login_required(login_url='signin')
+def like_post(request):
+   username=request.user.username
+   post_id=request.GET.get('post_id')
+   
+   post_obj=Post.objects.get(id=post_id)
+
+   like_filter = LikePost.objects.filter(username=username,post_id=post_id).first()
+   if like_filter==None:
+      new_like=LikePost.objects.create(username=username,post_id=post_id)
+      new_like.save()
+      post_obj.no_of_likes+=1
+      post_obj.save()
+      return redirect('/')
+
+   else:
+      like_filter.delete()
+      post_obj.no_of_likes-=1
+      post_obj.save()
+      return redirect('/')
+

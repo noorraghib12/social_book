@@ -30,3 +30,17 @@ class Post(models.Model):
 
     def __str__(self):
         return self.user
+    
+# class Comment(models.Model):
+#     user = models.ForeignKey(User,on_delete=models.CASCADE)
+#     post = models.ForeignKey(Post, on_delete=models.CASCADE)
+#     comment=models.TextField()
+#     created_at=models.DateTimeField(default=datetime.now)
+#     no_of_likes=models.IntegerField(default=0)
+
+class LikePost(models.Model):
+    post_id=models.CharField(max_length=20000)
+    username=models.CharField(max_length=100)
+    
+    def __str__(self):
+        return self.username
