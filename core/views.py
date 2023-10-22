@@ -1,9 +1,9 @@
 from django.shortcuts import render,redirect
-from .models import Profile,Post,LikePost
+from .models import Profile,Post,LikePost,Comment,FollowedCount
 from django.contrib.auth.models import User,auth
 from django.contrib.auth import get_user
 from django.contrib import messages
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 # Create your views here.
@@ -121,3 +121,46 @@ def like_post(request):
       post_obj.save()
       return redirect('/')
 
+
+@login_required(login_url='signin')
+def comment(request):
+   if request.method=='POST':
+      user=request.user
+      user_profile=Profile.objects.get(user=user)
+      post_id=request.POST['post_id']
+      post=Post.objects.get(id=post_id)
+      comment=request.POST['comment']
+      print(comment,post_id)
+      new_comment=Comment.objects.create(post=post,profile=user_profile,usr_comment=comment)
+      new_comment.save()
+      return redirect('/')
+   else:
+      return redirect('/')
+   
+@login_required(login_url='signin')
+def profile(request,pk):
+   user=User.objects.get(username=pk)
+   profile=Profile.objects.get(user=user)
+   posts=user.posts.all()
+   print([post.caption for post in posts])
+   context={
+      'profile':profile,
+      'posts':posts,
+      'post_length':len(posts),
+
+   }
+   return render(request,'profile.html',context=context)
+
+@login_required(login_url='signin')
+def follow(request):
+   user=request.user
+   follow_filter=FollowedCount.objects.filter(user=user,following=follow_user).first()
+   if request.method=='POST':
+      following_name=request.POST['followed_user']
+      follow_user=User.objects.get(username=following_name)
+      if follow_filter==None:
+         new_follow=FollowedCount.objects.create(user=user,following=follow_user)
+         new_follow.save()
+      else:
+         follow_filter.delete()      
+   return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
