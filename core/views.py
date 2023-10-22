@@ -6,13 +6,16 @@ from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
+from itertools import chain
 # Create your views here.
 @login_required(login_url='signin')
 def index(request):
    user_object = User.objects.get(username=request.user.username)
    user_profile = Profile.objects.get(user=user_object)
-
-   posts=Post.objects.all()
+   followed_usrnames=FollowedCount.objects.filter(user=user_object.username).values_list('following',flat=True)
+   followings=list(chain(User.objects.filter(username__in=followed_usrnames).all(),[user_object]))
+   print([str(following) for following in followings])
+   posts=Post.objects.filter(user__in=followings).all().order_by('created_at')
    return render(request,'index.html',{'user_profile':user_profile,'posts':posts})
 
 def signup(request):
@@ -154,12 +157,17 @@ def profile(request,pk):
 @login_required(login_url='signin')
 def follow(request):
    user=request.user
-   follow_filter=FollowedCount.objects.filter(user=user,following=follow_user).first()
+   
    if request.method=='POST':
       following_name=request.POST['followed_user']
       follow_user=User.objects.get(username=following_name)
-      if follow_filter==None:
-         new_follow=FollowedCount.objects.create(user=user,following=follow_user)
+      follow_filter=FollowedCount.objects.filter(user=user.username,following=follow_user.username).first()
+
+      if user.username==follow_user.username:
+         messages.info(request, "Cannot follow one's own profile")
+         redirect(f'/profile/{user.username}')
+      elif follow_filter==None:
+         new_follow=FollowedCount.objects.create(user=user.username,following=follow_user.username)
          new_follow.save()
       else:
          follow_filter.delete()      

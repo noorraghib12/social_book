@@ -49,5 +49,5 @@ class LikePost(models.Model):
     
 
 class FollowedCount(models.Model):
-    user=models.ForeignKey(User,on_delete=models.CASCADE,related_name='followers')
-    following=models.ForeignKey(User,on_delete=models.CASCADE,related_name='following')
+    user=models.CharField(max_length=200)
+    following=models.CharField(max_length=200)

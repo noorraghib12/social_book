@@ -37,6 +37,7 @@
 			<div class="feature-photo">
 				<figure><img src="{% static 'images/resources/timeline-1.jpg' %}" alt=""></figure>
 				<form action="/follow" method="POST">
+					{% csrf_token %}
 					<div class="add-btn">
 					<span style="color: white; font-size: 27px; margin-right: 520px;"><b><u><a href="/">Home</a></u></b></span>
 					{% if post_length == 0 %}
@@ -332,7 +333,7 @@
 							
 	
 	
-	<script data-cfasync="false" src="{% static '../../cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js' %}"></script><script src="{% static js/main.min.js %}"></script>
+	<script data-cfasync="false" src="{% static '../../cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js' %}"></script><script src="{% static 'js/main.min.js' %}"></script>
 	<script src="{% static 'js/script.js' %}"></script>
 	<script src="{% static 'assets/js/tippy.all.min.js' %}"></script>  
     <script src="{% static 'assets/js/jquery-3.3.1.min.js' %}"></script>
