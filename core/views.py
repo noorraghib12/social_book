@@ -5,6 +5,7 @@ from django.contrib.auth import get_user
 from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib import auth
+from django.db.models import Q,Count
 from django.contrib.auth.decorators import login_required
 from itertools import chain
 # Create your views here.
@@ -12,11 +13,20 @@ from itertools import chain
 def index(request):
    user_object = User.objects.get(username=request.user.username)
    user_profile = Profile.objects.get(user=user_object)
+   
    followed_usrnames=FollowedCount.objects.filter(user=user_object.username).values_list('following',flat=True)
+   follower_usrnames=FollowedCount.objects.filter(following=user_object.username).values_list('user',flat=True)
+
+
    followings=list(chain(User.objects.filter(username__in=followed_usrnames).all(),[user_object]))
-   print([str(following) for following in followings])
    posts=Post.objects.filter(user__in=followings).all().order_by('created_at')
-   return render(request,'index.html',{'user_profile':user_profile,'posts':posts})
+   
+   
+   suggested_followers=FollowedCount.objects.filter(user__in=list(chain(follower_usrnames,followed_usrnames))).exclude(Q(following__in=followings))
+   suggestions=FollowedCount.objects.filter(following__in=suggested_followers.values_list('following',flat=True)).values_list('following').annotate(followers=Count('user'))
+   suggested_users=[(User.objects.get(username=username).profile.first(),n_followers) for (username,n_followers) in suggestions]
+   print(suggested_users)
+   return render(request,'index.html',{'user_profile':user_profile,'posts':posts,'user_suggestions':suggested_users})
 
 def signup(request):
    if request.method=='POST':
@@ -144,13 +154,20 @@ def comment(request):
 def profile(request,pk):
    user=User.objects.get(username=pk)
    profile=Profile.objects.get(user=user)
+
    posts=user.posts.all()
-   print([post.caption for post in posts])
+   box_text='Follow'
+   if FollowedCount.objects.filter(following=pk,user=request.user.username).exists():
+      box_text='Unfollow'
+   user_followers=len(FollowedCount.objects.filter(following=pk))
+   user_followings=len(FollowedCount.objects.filter(user=pk))
    context={
       'profile':profile,
       'posts':posts,
       'post_length':len(posts),
-
+      'button_text':box_text,
+      'user_followers':user_followers,
+      'user_followings':user_followings,
    }
    return render(request,'profile.html',context=context)
 

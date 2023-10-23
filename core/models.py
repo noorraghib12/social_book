@@ -51,3 +51,6 @@ class LikePost(models.Model):
 class FollowedCount(models.Model):
     user=models.CharField(max_length=200)
     following=models.CharField(max_length=200)
+
+    def __str__(self):
+        return f"U_{self.user}_F_{self.following}"

@@ -45,12 +45,16 @@
 					{% else %}
 					<span style="color: white; font-size: 27px;"><b>{{post_length}} Post</b></span>
 					{% endif %}
-					<span style="color: white; font-size: 27px;"><b>1.7m followers</b></span>
-					<span style="color: white; font-size: 27px;"><b>3.5k following</b></span>
+					<span style="color: white; font-size: 27px;"><b>{{user_followers}} followers</b></span>
+					<span style="color: white; font-size: 27px;"><b>{{user_followings}} following</b></span>
 					<input name="followed_user" type="hidden" value="{{profile.user}}"> 
-					<a href="" title="" data-ripple=""><button type="submit" style="background-color: #ffc0cb; border: #ffc0cb;">Follow</button></a>
-					
+					{% if profile.user.username == user.username %}
+					<a href="/settings" title="" data-ripple="" style="background-color: #ffc0cb; border: #ffc0cb;">Settings</a>
+					{% else %}
+					<a href="" title="" data-ripple=""><button type="submit" style="background-color: #ffc0cb; border: #ffc0cb;">{{button_text}}</button></a>
+					{% endif %}
 					</div>
+			<div class=></div>
 				</form>
 
 				<!-- <form class="edit-phto">
